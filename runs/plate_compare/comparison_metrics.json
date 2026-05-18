@@ -1,0 +1,28 @@
+[
+  {
+    "precision": 0.0033333333333333335,
+    "recall": 1.0,
+    "map50": 0.9915491525423729,
+    "map50_95": 0.7115653016277712,
+    "speed_preprocess_ms": 0.31769085999258095,
+    "speed_inference_ms": 4.106025799992494,
+    "speed_postprocess_ms": 0.5782711999927415,
+    "model": "yolov8n.pt",
+    "run_dir": "/mnt/users/xj62kv/license-plates-yolo/runs/plate_compare/yolov8n",
+    "test_dir": "/mnt/users/xj62kv/license-plates-yolo/runs/plate_compare/yolov8n_test",
+    "predict_dir": "/mnt/users/xj62kv/license-plates-yolo/runs/plate_compare/yolov8n_predict"
+  },
+  {
+    "precision": 1.0,
+    "recall": 0.9916776088216103,
+    "map50": 0.995,
+    "map50_95": 0.7236280974592357,
+    "speed_preprocess_ms": 0.36753161999513395,
+    "speed_inference_ms": 0.42224902001180453,
+    "speed_postprocess_ms": 0.10122620000402094,
+    "model": "yolov10n.pt",
+    "run_dir": "/mnt/users/xj62kv/license-plates-yolo/runs/plate_compare/yolov10n",
+    "test_dir": "/mnt/users/xj62kv/license-plates-yolo/runs/plate_compare/yolov10n_test",
+    "predict_dir": "/mnt/users/xj62kv/license-plates-yolo/runs/plate_compare/yolov10n_predict"
+  }
+]
