@@ -1,0 +1,39 @@
+# Python 虚拟环境与缓存
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 本地配置与密钥
+.env
+.env.*
+*.local
+
+# 日志与 Slurm 输出
+logs/
+slurm_logs/
+*.log
+*.out
+*.err
+
+# Ultralytics/训练运行时输出，最终需要入库的小型图表可手动复制到 reports/assets/
+runs/
+wandb/
+mlruns/
+
+# 数据集通常体积较大，默认不纳入版本管理
+data/raw/
+data/ccpd_yolo/
+
+# 模型权重文件通常较大，由训练或下载生成
+*.pt
+*.onnx
+*.engine
+
+# 系统与编辑器文件
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
