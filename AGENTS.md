@@ -51,6 +51,9 @@
 - 新增 CCPD 文件名解析与 YOLO 坐标归一化测试。
 - 使用 `.venv` 完成依赖安装，并通过 `pytest tests` 验证。
 - 初始化前确认 `.gitignore` 已覆盖 `.venv`、缓存、训练输出和本地数据目录。
+- 同步全局 Codex 默认规则：Slurm 默认使用 `#SBATCH --account=gpo-ifv7xx` 与 `#SBATCH --qos=normal`。
+- 更新车牌实验 Slurm 脚本，写入默认 account/qos，并移除作业内创建 `slurm_logs` 的步骤，避免集群计算节点权限限制导致任务提前失败。
+- 修正 Slurm 项目根目录解析方式，改用 `SLURM_SUBMIT_DIR`，确保作业使用提交目录中的项目代码和 `.venv`，而不是计算节点 `/var/spool` 下的临时脚本目录。
 
 ## 下一步计划
 
@@ -71,3 +74,5 @@
 - 数据集只使用水平矩形框检测标签，不使用 OBB，也不解析字符类别。
 - 模型保持原始 `yolov8n.pt` 与 `yolov10n.pt`，不做结构改进或额外调参搜索。
 - 报告采用 Markdown，便于直接版本管理和引用训练输出图表。
+- 当前集群 Slurm GPU 作业默认组合为 `partition=aws`、`account=gpo-ifv7xx`、`qos=normal`；如分区不匹配，应先用 `sacctmgr show assoc user=$USER format=User,Account,Partition,QOS` 确认可用组合。
+- Slurm 脚本中项目根目录应优先使用 `SLURM_SUBMIT_DIR`，避免 `BASH_SOURCE[0]` 在计算节点临时目录中解析出错误路径。

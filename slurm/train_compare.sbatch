@@ -1,6 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=plate-yolo-compare
 #SBATCH --partition=aws
+#SBATCH --account=gpo-ifv7xx
+#SBATCH --qos=normal
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -16,12 +18,15 @@
 
 set -euo pipefail
 
-# 切换到项目根目录，保证相对路径与 README 中一致。
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# 切换到提交作业时所在的项目根目录，保证使用共享文件系统中的代码和 `.venv`。
+# Slurm 可能会把脚本复制到 `/var/spool/...` 后再执行，如果用 `BASH_SOURCE[0]`
+# 反推路径，就会误指向计算节点临时目录，导致找不到项目虚拟环境。
+PROJECT_DIR="${SLURM_SUBMIT_DIR:-$(pwd)}"
 cd "${PROJECT_DIR}"
 
-# Slurm 日志目录由 #SBATCH --output/--error 使用，提交前确保存在。
-mkdir -p slurm_logs
+# Slurm 日志目录由 #SBATCH --output/--error 使用。
+# 注意：部分集群会在作业启动前创建日志文件，但计算节点对项目目录的
+# 目录创建权限更严格，因此不要在作业内部再次创建该目录。
 
 # 始终使用项目本地虚拟环境，不依赖系统 Python 或 shell 激活状态。
 PYTHON="${PROJECT_DIR}/.venv/bin/python"
