@@ -93,7 +93,7 @@ def train_one_model(args: argparse.Namespace, model_weight: str) -> dict[str, fl
     model_name = Path(model_weight).stem
     model = YOLO(model_weight)
 
-    model.train(
+    train_result = model.train(
         data=str(args.data),
         epochs=args.epochs,
         imgsz=args.imgsz,
@@ -107,7 +107,18 @@ def train_one_model(args: argparse.Namespace, model_weight: str) -> dict[str, fl
         exist_ok=True,
     )
 
-    best_weight = args.project / model_name / "weights" / "best.pt"
+    # Ultralytics 在不同版本和运行环境下可能会把相对 `project` 拼到默认
+    # `runs/detect` 目录下面。这里不再手写推断输出目录，而是优先读取训练器
+    # 实际记录的 `save_dir`，确保后续验证加载的就是刚训练出的 best.pt。
+    save_dir_value = getattr(model.trainer, "save_dir", None) or getattr(train_result, "save_dir", None)
+    if save_dir_value is None:
+        raise RuntimeError("无法从 Ultralytics 训练结果中获取保存目录")
+
+    train_save_dir = Path(save_dir_value)
+    best_weight = train_save_dir / "weights" / "best.pt"
+    if not best_weight.exists():
+        raise FileNotFoundError(f"未找到训练得到的 best.pt：{best_weight}")
+
     eval_model = YOLO(str(best_weight))
     predict_source = resolve_predict_source(args.data, args.predict_source)
 
@@ -136,7 +147,7 @@ def train_one_model(args: argparse.Namespace, model_weight: str) -> dict[str, fl
 
     result = collect_metrics(val_metrics)
     result["model"] = model_weight
-    result["run_dir"] = str(args.project / model_name)
+    result["run_dir"] = str(train_save_dir)
     result["test_dir"] = str(args.project / f"{model_name}_test")
     result["predict_dir"] = str(args.project / f"{model_name}_predict")
     return result
@@ -161,6 +172,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    args.project = args.project.resolve()
     args.project.mkdir(parents=True, exist_ok=True)
 
     results = [train_one_model(args, model_weight) for model_weight in args.models]

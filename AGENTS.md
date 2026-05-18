@@ -54,6 +54,8 @@
 - 同步全局 Codex 默认规则：Slurm 默认使用 `#SBATCH --account=gpo-ifv7xx` 与 `#SBATCH --qos=normal`。
 - 更新车牌实验 Slurm 脚本，写入默认 account/qos，并移除作业内创建 `slurm_logs` 的步骤，避免集群计算节点权限限制导致任务提前失败。
 - 修正 Slurm 项目根目录解析方式，改用 `SLURM_SUBMIT_DIR`，确保作业使用提交目录中的项目代码和 `.venv`，而不是计算节点 `/var/spool` 下的临时脚本目录。
+- 同步全局 Codex 默认规则：当前集群 PyTorch GPU 环境默认使用 CUDA 12.x 兼容 wheel，优先安装 `cu126` 版 `torch torchvision`，避免误装 `cu130` 导致驱动不兼容。
+- 修正训练脚本的权重路径获取逻辑：不再手写推断 `best.pt` 路径，而是使用 Ultralytics 实际训练输出目录，避免相对 `project` 被保存到 `runs/detect/...` 时后续验证找不到权重。
 
 ## 下一步计划
 
@@ -76,3 +78,5 @@
 - 报告采用 Markdown，便于直接版本管理和引用训练输出图表。
 - 当前集群 Slurm GPU 作业默认组合为 `partition=aws`、`account=gpo-ifv7xx`、`qos=normal`；如分区不匹配，应先用 `sacctmgr show assoc user=$USER format=User,Account,Partition,QOS` 确认可用组合。
 - Slurm 脚本中项目根目录应优先使用 `SLURM_SUBMIT_DIR`，避免 `BASH_SOURCE[0]` 在计算节点临时目录中解析出错误路径。
+- 当前集群 NVIDIA 驱动不适合 CUDA 13.0 PyTorch wheel；GPU 训练环境默认使用 `--index-url https://download.pytorch.org/whl/cu126` 安装 `torch torchvision`，并在提交前确认 `torch.cuda.is_available()` 为 `True`。
+- Ultralytics 训练结果目录应以运行时返回的 `save_dir` 为准；脚本不要依赖手写路径推断来定位 `weights/best.pt`。
