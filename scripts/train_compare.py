@@ -28,6 +28,28 @@ def normalize_batch(batch: str) -> int | float:
     return int(batch)
 
 
+def normalize_eval_batch(batch: str, trainer: Any | None = None) -> int:
+    """解析验证/预测阶段使用的 batch size。
+
+    Ultralytics 训练阶段支持 `batch=-1` 自动估算显存，但验证阶段的
+    DataLoader 要求 batch size 必须是正整数。因此当用户传入 `auto` 时，
+    优先复用训练器中最终确定的 batch；如果取不到，则使用 16 作为稳妥默认值。
+    """
+
+    if batch.lower() != "auto":
+        return int(float(batch))
+
+    trainer_batch = getattr(getattr(trainer, "args", None), "batch", None)
+    try:
+        trainer_batch_value = int(float(trainer_batch))
+        if trainer_batch_value > 0:
+            return trainer_batch_value
+    except (TypeError, ValueError):
+        pass
+
+    return 16
+
+
 def metric_to_float(value: Any) -> float | None:
     """把 Ultralytics 返回的指标安全转换为浮点数。"""
 
@@ -121,12 +143,13 @@ def train_one_model(args: argparse.Namespace, model_weight: str) -> dict[str, fl
 
     eval_model = YOLO(str(best_weight))
     predict_source = resolve_predict_source(args.data, args.predict_source)
+    eval_batch = normalize_eval_batch(args.batch, model.trainer)
 
     val_metrics = eval_model.val(
         data=str(args.data),
         split="test",
         imgsz=args.imgsz,
-        batch=normalize_batch(args.batch),
+        batch=eval_batch,
         project=str(args.project),
         name=f"{model_name}_test",
         device=args.device,
@@ -138,6 +161,7 @@ def train_one_model(args: argparse.Namespace, model_weight: str) -> dict[str, fl
         source=str(predict_source),
         imgsz=args.imgsz,
         conf=args.conf,
+        batch=eval_batch,
         project=str(args.project),
         name=f"{model_name}_predict",
         device=args.device,
