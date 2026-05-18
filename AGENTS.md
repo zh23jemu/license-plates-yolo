@@ -57,6 +57,8 @@
 - 同步全局 Codex 默认规则：当前集群 PyTorch GPU 环境默认使用 CUDA 12.x 兼容 wheel，优先安装 `cu126` 版 `torch torchvision`，避免误装 `cu130` 导致驱动不兼容。
 - 修正训练脚本的权重路径获取逻辑：不再手写推断 `best.pt` 路径，而是使用 Ultralytics 实际训练输出目录，避免相对 `project` 被保存到 `runs/detect/...` 时后续验证找不到权重。
 - 修正验证阶段 batch 处理：训练阶段仍允许 `batch=auto`，但验证和预测阶段改用正整数 batch，避免 Ultralytics DataLoader 收到 `-1` 报错。
+- 完善实验报告，补充摘要、数据预处理、实验环境、训练命令、结果分析、结论和局限性说明。
+- 新增面向用户提交的实验报告 `reports/user_experiment_report.md`，报告内容不包含 Slurm 集群训练说明，改为普通 Windows GPU 训练环境和命令。
 
 ## 下一步计划
 
@@ -82,3 +84,4 @@
 - 当前集群 NVIDIA 驱动不适合 CUDA 13.0 PyTorch wheel；GPU 训练环境默认使用 `--index-url https://download.pytorch.org/whl/cu126` 安装 `torch torchvision`，并在提交前确认 `torch.cuda.is_available()` 为 `True`。
 - Ultralytics 训练结果目录应以运行时返回的 `save_dir` 为准；脚本不要依赖手写路径推断来定位 `weights/best.pt`。
 - Ultralytics 的 `batch=auto` 仅用于训练阶段；验证和预测阶段应传入正整数 batch。
+- 最终报告以 mAP50-95 作为主要精度判断依据；当 Precision 与 mAP 指标表现不一致时，应在报告中解释可能原因并避免过度解读。

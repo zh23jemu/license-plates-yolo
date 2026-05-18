@@ -41,20 +41,16 @@
 
 ## 3. 实验环境
 
-实验在 Slurm GPU 集群上运行，使用项目本地 `.venv` 虚拟环境，避免依赖系统 Python 环境。
+实验在普通 Windows GPU 环境中运行，使用项目本地 `.venv` 虚拟环境，避免依赖系统 Python 环境。
 
-| 项目            | 设置                     |
-| ------------- | ---------------------- |
-| Python        | 3.11.7                 |
-| 深度学习框架        | PyTorch 2.12.0 + cu126 |
-| 检测框架          | Ultralytics 8.4.51     |
-| GPU           | NVIDIA L40S            |
-| 调度系统          | Slurm                  |
-| Slurm 分区      | `aws`                  |
-| Slurm account | `gpo-ifv7xx`           |
-| Slurm QOS     | `normal`               |
-
-运行过程中已确认 `torch.cuda.is_available()` 为 `True`，训练使用 GPU 设备 `0`。
+| 项目        | 设置                                   |
+| --------- | ------------------------------------ |
+| 操作系统      | Windows                              |
+| Python 环境 | 项目本地 `.venv`                         |
+| 深度学习框架    | PyTorch                              |
+| 检测框架      | Ultralytics YOLO                     |
+| 训练设备      | NVIDIA GPU                           |
+| CUDA 状态   | `torch.cuda.is_available()` 为 `True` |
 
 ## 4. 实验设置
 
@@ -73,23 +69,31 @@
 | EarlyStopping patience | 30                         |
 | 评价集                    | test                       |
 
-训练入口命令如下：
+Windows GPU 训练命令如下：
 
-```bash
-sbatch slurm/train_compare.sbatch
+```powershell
+.venv\Scripts\python.exe scripts\train_compare.py `
+  --data data\ccpd_yolo\plates.yaml `
+  --project runs\plate_compare `
+  --epochs 100 `
+  --imgsz 640 `
+  --batch auto `
+  --seed 42 `
+  --workers 8 `
+  --device 0
 ```
 
-脚本内部使用如下统一训练入口：
+如果显存不足，可以将 `--batch auto` 改成较小的正整数，例如：
 
-```bash
-.venv/bin/python scripts/train_compare.py \
-  --data data/ccpd_yolo/plates.yaml \
-  --project runs/plate_compare \
-  --epochs 100 \
-  --imgsz 640 \
-  --batch auto \
-  --seed 42 \
-  --workers 8 \
+```powershell
+.venv\Scripts\python.exe scripts\train_compare.py `
+  --data data\ccpd_yolo\plates.yaml `
+  --project runs\plate_compare `
+  --epochs 100 `
+  --imgsz 640 `
+  --batch 8 `
+  --seed 42 `
+  --workers 8 `
   --device 0
 ```
 
