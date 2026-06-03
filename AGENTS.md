@@ -59,6 +59,11 @@
 - 修正验证阶段 batch 处理：训练阶段仍允许 `batch=auto`，但验证和预测阶段改用正整数 batch，避免 Ultralytics DataLoader 收到 `-1` 报错。
 - 完善实验报告，补充摘要、数据预处理、实验环境、训练命令、结果分析、结论和局限性说明。
 - 新增面向用户提交的实验报告 `reports/user_experiment_report.md`，报告内容不包含 Slurm 集群训练说明，改为普通 Windows GPU 训练环境和命令。
+- 将用户版 Markdown 实验报告转换为 Word 文档 `reports/user_experiment_report.docx`，按截图要求设置中文/英文正文字体、标题层级、首行缩进和 1.5 倍行距，并完成渲染检查。
+- 向 `reports/b6b7cd57_rewritten_2780877452_user_experiment_report.docx` 追加 F1、PR、Precision、Recall、混淆矩阵和训练结果曲线图，并补充图表说明。
+- 调整 Word 报告章节顺序，将训练曲线与可视化结果放在结果分析之后，将结论和局限性与后续工作移到文档最后。
+- 生成面向用户交付的压缩包 `reports/license_plate_yolo_user_delivery.zip`，包含最终 Word 报告、代码、500 张数据集包、模型权重和关键曲线图。
+- 新增 YOLOv8n F1-Confidence 正常形态示意图，文件名包含 `schematic`，图中明确标注仅作示意，不作为真实实验结果。
 
 ## 下一步计划
 
@@ -85,3 +90,8 @@
 - Ultralytics 训练结果目录应以运行时返回的 `save_dir` 为准；脚本不要依赖手写路径推断来定位 `weights/best.pt`。
 - Ultralytics 的 `batch=auto` 仅用于训练阶段；验证和预测阶段应传入正整数 batch。
 - 最终报告以 mAP50-95 作为主要精度判断依据；当 Precision 与 mAP 指标表现不一致时，应在报告中解释可能原因并避免过度解读。
+- Word 版用户报告采用普通 Windows GPU 训练口径，不写 Slurm 集群训练细节；文档渲染 QA 图片目录 `reports/rendered_*/` 作为中间产物忽略。
+- 报告中的训练曲线图优先引用 `reports/deliverables/figures/` 下已筛选的关键图片，不直接引用完整 `runs/` 目录。
+- Word 报告最终章节顺序应保持为：结果分析、训练曲线与可视化结果、结论、局限性与后续工作。
+- 用户交付包内文档只保留 `report/user_experiment_report.docx` 和一份 `README.md`，不放其它 Markdown 报告或中间 Word 文档。
+- 示意图必须明确标注 `Schematic` 或“示意图”，不得替换真实实验结果图后冒充训练输出。

@@ -23,6 +23,10 @@ runs/
 wandb/
 mlruns/
 
+# 文档渲染 QA 中间产物，最终只交付 docx
+reports/rendered_*/
+reports/rendered_*.png
+
 # 数据集通常体积较大，默认不纳入版本管理
 data/raw/
 data/ccpd_yolo/
